@@ -16,6 +16,9 @@ export const metadata = {
   title: "NyaySetu — Your Legal AI Assistant",
   description:
     "NyaySetu helps ordinary Indian citizens understand their legal rights, get practical guidance, and draft formal complaints using AI.",
+  verification: {
+    google: "MobHAuqcZ1yNhudfZqopHeWdJy2k3QglfbTPpM9bqKM",
+  },
 };
 
 export default function RootLayout({ children }) {
