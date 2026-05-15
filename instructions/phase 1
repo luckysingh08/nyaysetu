@@ -1,0 +1,904 @@
+# NYAYSETU — MASTER PROJECT CONTEXT FILE
+# Version: 1.0 | Phase 1 Complete | Date: May 2026
+# PURPOSE: Paste this entire file at the start of every new chat session
+# to give Claude full context of the project without any information loss.
+
+---
+
+## ROLE INSTRUCTIONS FOR CLAUDE
+
+You are my full-time cofounder, CTO, senior product strategist, AI architect,
+full-stack engineer, UX designer, and legal-tech advisor for NyaySetu.
+
+Act like a serious cofounder. Be proactive, detailed, technical, strategic,
+beginner-friendly, and execution-focused. Do not skip steps. Always explain
+what to do, why it matters, how to do it, and what mistakes to avoid.
+
+The owner of this project is Lucky Singh (GitHub: luckysingh08).
+He is a beginner developer. Explain everything simply. Never assume knowledge.
+
+---
+
+## PROJECT IDENTITY
+
+Name: NyaySetu
+Meaning: Bridge to Justice
+Tagline: Your Legal AI Assistant
+Mission: Democratize legal knowledge for ordinary Indian citizens.
+
+Core problems solved:
+- Lack of legal awareness among Indian citizens
+- Misinformation about police, courts, rights, procedures
+- Poor access to legal resources
+- Difficulty understanding complex legal language
+- Difficulty taking the first practical legal step
+
+---
+
+## LIVE DEPLOYMENT
+
+Live URL: https://nyaysetu-eight.vercel.app
+GitHub: https://github.com/luckysingh08/nyaysetu
+Vercel Dashboard: vercel.com (logged in as luckysingh08)
+Google Search Console: Verified and indexing requested for live URL
+
+---
+
+## COMPLETE TECH STACK
+
+Frontend:
+- Next.js 16.2.6 (App Router)
+- React
+- Tailwind CSS
+- Framer Motion (animations)
+- react-markdown (output rendering)
+
+Backend:
+- Next.js API Routes (server-side only)
+- All AI calls happen on server — never on frontend
+
+AI:
+- Google Gemini API
+- Model: gemini-2.5-flash
+- Free tier: 500 requests/day, 10 RPM
+- SDK: @google/generative-ai
+
+Deployment:
+- Vercel (auto-deploys on every GitHub push)
+- GitHub repository: luckysingh08/nyaysetu
+
+Environment Variables:
+- GEMINI_API_KEY stored in .env.local locally
+- GEMINI_API_KEY stored in Vercel dashboard (locked/encrypted)
+- API key NEVER exposed in frontend code
+
+---
+
+## COMPLETE PROJECT FILE STRUCTURE
+
+nyaysetu/
+├── app/
+│   ├── api/
+│   │   ├── ask/
+│   │   │   └── route.js        ← Legal Q&A backend API
+│   │   └── complaint/
+│   │       └── route.js        ← Complaint generator backend API
+│   ├── globals.css             ← Full black gold theme + custom CSS
+│   ├── layout.js               ← Root layout, fonts, metadata, GSC verification
+│   └── page.js                 ← Complete main UI with all components
+├── public/                     ← Static assets
+├── .env.local                  ← GEMINI_API_KEY (never committed to GitHub)
+├── .gitignore                  ← Includes .env.local
+├── AGENTS.md
+├── CLAUDE.md
+├── NYAYSETU_MASTER_CONTEXT.md  ← This file
+├── jsconfig.json
+├── next.config.mjs
+├── package.json
+├── package-lock.json
+└── postcss.config.mjs
+
+---
+
+## COMPLETE FILE CONTENTS
+
+### FILE 1: app/layout.js
+
+```javascript
+import { Inter } from "next/font/google";
+import { Playfair_Display } from "next/font/google";
+import "./globals.css";
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+});
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-playfair",
+});
+
+export const metadata = {
+  title: "NyaySetu — Your Legal AI Assistant",
+  description:
+    "NyaySetu helps ordinary Indian citizens understand their legal rights, get practical guidance, and draft formal complaints using AI.",
+  verification: {
+    google: "YOUR_GOOGLE_VERIFICATION_CODE",
+  },
+};
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+      <body className={`${inter.variable} ${playfair.variable} antialiased`}>
+        {children}
+      </body>
+    </html>
+  );
+}
+```
+
+---
+
+### FILE 2: app/globals.css
+
+```css
+@import "tailwindcss";
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: linear-gradient(135deg, #0a0a0a 0%, #111111 50%, #0d0d0d 100%);
+  min-height: 100vh;
+  font-family: var(--font-inter), sans-serif;
+  color: #ffffff;
+}
+
+.font-playfair {
+  font-family: var(--font-playfair), serif;
+}
+
+.font-inter {
+  font-family: var(--font-inter), sans-serif;
+}
+
+.gold-text {
+  background: linear-gradient(135deg, #d4af37, #f0d060, #b8962e);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+}
+
+.btn-gold {
+  background: linear-gradient(135deg, #d4af37, #b8962e);
+  color: #0a0a0a;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-gold:hover {
+  background: linear-gradient(135deg, #f0d060, #d4af37);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);
+}
+
+.btn-dark {
+  background: rgba(255, 255, 255, 0.06);
+  color: #d1d5db;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-dark:hover {
+  background: rgba(255, 255, 255, 0.10);
+  border-color: rgba(212, 175, 55, 0.4);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #111; }
+::-webkit-scrollbar-thumb { background: #d4af37; border-radius: 3px; }
+
+textarea { resize: none; outline: none; }
+textarea:focus {
+  border-color: rgba(212, 175, 55, 0.5) !important;
+  box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.1);
+}
+```
+
+---
+
+### FILE 3: app/page.js
+
+```javascript
+"use client";
+
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import ReactMarkdown from "react-markdown";
+
+function ScaleLogo() {
+  return (
+    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <line x1="24" y1="6" x2="24" y2="42" stroke="#d4af37" strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="10" y1="42" x2="38" y2="42" stroke="#d4af37" strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="8" y1="16" x2="40" y2="16" stroke="#d4af37" strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="8" y1="16" x2="24" y2="8" stroke="#d4af37" strokeWidth="1" />
+      <line x1="40" y1="16" x2="24" y2="8" stroke="#d4af37" strokeWidth="1" />
+      <path d="M2 16 Q8 22 14 16" stroke="#d4af37" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+      <path d="M34 16 Q40 22 46 16" stroke="#d4af37" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+      <circle cx="24" cy="8" r="1.5" fill="#d4af37" />
+    </svg>
+  );
+}
+
+function Spinner() {
+  return (
+    <div className="flex items-center justify-center gap-2">
+      <motion.div className="w-2 h-2 rounded-full" style={{ background: "#d4af37" }}
+        animate={{ scale: [1, 1.5, 1], opacity: [1, 0.5, 1] }}
+        transition={{ duration: 1, repeat: Infinity, delay: 0 }} />
+      <motion.div className="w-2 h-2 rounded-full" style={{ background: "#d4af37" }}
+        animate={{ scale: [1, 1.5, 1], opacity: [1, 0.5, 1] }}
+        transition={{ duration: 1, repeat: Infinity, delay: 0.2 }} />
+      <motion.div className="w-2 h-2 rounded-full" style={{ background: "#d4af37" }}
+        animate={{ scale: [1, 1.5, 1], opacity: [1, 0.5, 1] }}
+        transition={{ duration: 1, repeat: Infinity, delay: 0.4 }} />
+    </div>
+  );
+}
+
+function OutputCard({ title, content, type }) {
+  const borderColor = type === "ask" ? "rgba(212,175,55,0.3)" : "rgba(255,255,255,0.1)";
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      className="glass-card p-6 mt-6"
+      style={{ borderColor }}
+    >
+      <div className="flex items-center gap-2 mb-4">
+        <div className="w-2 h-2 rounded-full"
+          style={{ background: type === "ask" ? "#d4af37" : "#6b7280" }} />
+        <h3 className="text-sm font-semibold uppercase tracking-widest"
+          style={{ color: type === "ask" ? "#d4af37" : "#9ca3af" }}>
+          {title}
+        </h3>
+      </div>
+      <div className="text-sm leading-relaxed prose prose-invert max-w-none"
+        style={{ color: "#e5e7eb" }}>
+        <ReactMarkdown
+          components={{
+            h3: ({ children }) => (
+              <h3 style={{ color: "#d4af37", fontWeight: "700", fontSize: "0.95rem", marginTop: "1.2rem", marginBottom: "0.4rem", letterSpacing: "0.02em" }}>{children}</h3>
+            ),
+            h2: ({ children }) => (
+              <h2 style={{ color: "#d4af37", fontWeight: "700", fontSize: "1rem", marginTop: "1.2rem", marginBottom: "0.4rem" }}>{children}</h2>
+            ),
+            strong: ({ children }) => (
+              <strong style={{ color: "#ffffff", fontWeight: "700" }}>{children}</strong>
+            ),
+            p: ({ children }) => (
+              <p style={{ marginBottom: "0.75rem", lineHeight: "1.8", color: "#e5e7eb" }}>{children}</p>
+            ),
+            li: ({ children }) => (
+              <li style={{ marginBottom: "0.4rem", color: "#e5e7eb", lineHeight: "1.7" }}>{children}</li>
+            ),
+            ul: ({ children }) => (
+              <ul style={{ paddingLeft: "1.2rem", marginBottom: "0.75rem" }}>{children}</ul>
+            ),
+            ol: ({ children }) => (
+              <ol style={{ paddingLeft: "1.2rem", marginBottom: "0.75rem" }}>{children}</ol>
+            ),
+          }}
+        >
+          {content}
+        </ReactMarkdown>
+      </div>
+    </motion.div>
+  );
+}
+
+export default function Home() {
+  const [query, setQuery] = useState("");
+  const [askLoading, setAskLoading] = useState(false);
+  const [complaintLoading, setComplaintLoading] = useState(false);
+  const [askResult, setAskResult] = useState("");
+  const [complaintResult, setComplaintResult] = useState("");
+  const [error, setError] = useState("");
+  const MAX_LENGTH = 1000;
+
+  async function handleAsk() {
+    if (!query.trim()) { setError("Please describe your legal issue first."); return; }
+    setError(""); setAskLoading(true); setAskResult("");
+    try {
+      const res = await fetch("/api/ask", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query }),
+      });
+      const data = await res.json();
+      if (data.error) { setError(data.error); } else { setAskResult(data.result); }
+    } catch { setError("Something went wrong. Please try again."); }
+    setAskLoading(false);
+  }
+
+  async function handleComplaint() {
+    if (!query.trim()) { setError("Please describe your legal issue first."); return; }
+    setError(""); setComplaintLoading(true); setComplaintResult("");
+    try {
+      const res = await fetch("/api/complaint", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query }),
+      });
+      const data = await res.json();
+      if (data.error) { setError(data.error); } else { setComplaintResult(data.result); }
+    } catch { setError("Something went wrong. Please try again."); }
+    setComplaintLoading(false);
+  }
+
+  return (
+    <main className="min-h-screen px-4 py-12 flex flex-col items-center">
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="flex flex-col items-center mb-10"
+      >
+        <ScaleLogo />
+        <h1 className="font-playfair text-4xl md:text-5xl font-bold mt-4 gold-text">NyaySetu</h1>
+        <p className="text-sm mt-2 tracking-widest uppercase" style={{ color: "#9ca3af" }}>
+          Your Legal AI Assistant
+        </p>
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
+        className="w-full max-w-2xl"
+      >
+        <div className="text-xs mb-4 px-4 py-3 rounded-lg"
+          style={{ background: "rgba(212,175,55,0.06)", border: "1px solid rgba(212,175,55,0.15)", color: "#9ca3af" }}>
+          🔒 Do not enter passwords, OTPs, Aadhaar numbers, or full bank details.
+        </div>
+
+        <div className="glass-card p-1">
+          <textarea
+            rows={5} maxLength={MAX_LENGTH} value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Describe your legal situation in simple words...
+
+Example: A traffic police officer stopped me and took my vehicle keys without giving any receipt. What are my rights?"
+            className="w-full bg-transparent px-4 py-4 text-sm rounded-xl"
+            style={{ color: "#f0f0f0", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "14px", lineHeight: "1.7" }}
+          />
+        </div>
+
+        <div className="text-right mt-1 text-xs" style={{ color: "#4b5563" }}>
+          {query.length}/{MAX_LENGTH}
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-3 mt-4">
+          <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+            onClick={handleAsk} disabled={askLoading || complaintLoading}
+            className="btn-gold flex-1 py-4 px-6 rounded-xl text-sm tracking-wide">
+            {askLoading ? <Spinner /> : "⚖️ Ask AI — Know Your Rights"}
+          </motion.button>
+          <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+            onClick={handleComplaint} disabled={askLoading || complaintLoading}
+            className="btn-dark flex-1 py-4 px-6 rounded-xl text-sm tracking-wide">
+            {complaintLoading ? <Spinner /> : "📝 Generate Complaint Draft"}
+          </motion.button>
+        </div>
+
+        <AnimatePresence>
+          {error && (
+            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+              className="mt-4 text-sm px-4 py-3 rounded-lg"
+              style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", color: "#f87171" }}>
+              {error}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {askResult && <OutputCard title="Legal Guidance — NyaySetu AI" content={askResult} type="ask" />}
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {complaintResult && <OutputCard title="Complaint Draft — NyaySetu AI" content={complaintResult} type="complaint" />}
+        </AnimatePresence>
+      </motion.div>
+
+      <motion.footer
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+        transition={{ delay: 0.8, duration: 0.6 }}
+        className="mt-16 max-w-2xl text-center"
+      >
+        <div className="text-xs px-6 py-4 rounded-xl"
+          style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", color: "#6b7280", lineHeight: "1.8" }}>
+          <span style={{ color: "#d4af37" }}>⚖️ Legal Disclaimer</span><br />
+          NyaySetu provides general legal information only. It is not a substitute
+          for advice from a qualified lawyer. Do not make important legal decisions
+          based solely on this information. For urgent matters involving arrest,
+          criminal charges, court deadlines, or serious financial loss — consult a
+          lawyer or your nearest Legal Services Authority immediately.
+        </div>
+        <p className="mt-4 text-xs" style={{ color: "#374151" }}>
+          © 2025 NyaySetu. Built for every Indian citizen.
+        </p>
+      </motion.footer>
+    </main>
+  );
+}
+```
+
+---
+
+### FILE 4: app/api/ask/route.js
+
+```javascript
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+const SYSTEM_PROMPT = `You are NyaySetu, an Indian legal information assistant. Your role is to explain Indian law in simple, practical language for ordinary citizens.
+
+You must:
+- Explain the relevant legal principle clearly
+- Mention applicable law or section if known
+- State what authorities (police, courts, employers, landlords, banks) can legally do
+- State what they cannot legally do
+- Give practical next steps
+- Suggest what evidence or documents the user should preserve
+- Encourage consulting a qualified lawyer when the issue is serious, urgent, criminal, or court-related
+- Avoid risky, illegal, or overconfident advice
+- Never fabricate legal sections or citations
+- If unsure, say what needs to be verified
+
+Answer structure:
+1. Simple Answer
+2. Relevant Law or Principle
+3. What the Authority Can Do
+4. What the Authority Cannot Do
+5. What You Should Do Next
+6. Documents or Evidence to Keep
+7. When to Consult a Lawyer
+8. Disclaimer
+
+Use simple English. Be calm, helpful, and precise. Keep each section clearly labeled.`;
+
+export async function POST(request) {
+  try {
+    const body = await request.json();
+    const { query } = body;
+
+    if (!query || typeof query !== "string") {
+      return Response.json({ error: "Please provide a valid question." }, { status: 400 });
+    }
+    if (query.trim().length < 10) {
+      return Response.json({ error: "Please describe your issue in more detail." }, { status: 400 });
+    }
+    if (query.length > 1000) {
+      return Response.json({ error: "Input too long. Please keep it under 1000 characters." }, { status: 400 });
+    }
+
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    const model = genAI.getGenerativeModel({
+      model: "gemini-2.5-flash",
+      systemInstruction: SYSTEM_PROMPT,
+    });
+
+    const result = await model.generateContent(query);
+    const text = result.response.text();
+    return Response.json({ result: text });
+  } catch (error) {
+    console.error("Ask API error:", error.message);
+    return Response.json(
+      { error: "Unable to process your request right now. Please try again." },
+      { status: 500 }
+    );
+  }
+}
+```
+
+---
+
+### FILE 5: app/api/complaint/route.js
+
+```javascript
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+const SYSTEM_PROMPT = `You are NyaySetu, an Indian legal drafting assistant. Convert the user's scenario into a formal complaint draft suitable for submission to a police station, cyber cell, consumer forum, or appropriate legal authority.
+
+You must:
+- Use formal but clear legal language
+- Do not invent facts
+- Use [PLACEHOLDER] for missing details
+- Keep the complaint fact-based
+- Avoid exaggeration or defamatory claims
+- Include a verification reminder at the end
+
+Complaint format:
+1. To: (Authority name)
+2. Subject: (One line summary)
+3. Complainant Details: Name: [YOUR FULL NAME], Address: [YOUR ADDRESS], Phone: [YOUR PHONE]
+4. Opposite Party Details: (if known, else write "Details to be filled by complainant")
+5. Date and Place of Incident
+6. Facts of the Complaint (numbered points)
+7. Legal Concern
+8. Evidence/Documents Available
+9. Prayer/Request for Action
+10. Signature: [YOUR SIGNATURE] Date: [DATE]
+11. IMPORTANT: Verify all facts before submission. Consult a lawyer for serious matters.
+
+If the scenario needs a consumer complaint, cybercrime complaint, or civil complaint instead of FIR — explain that clearly and draft accordingly.`;
+
+export async function POST(request) {
+  try {
+    const body = await request.json();
+    const { query } = body;
+
+    if (!query || typeof query !== "string") {
+      return Response.json({ error: "Please provide a valid description." }, { status: 400 });
+    }
+    if (query.trim().length < 10) {
+      return Response.json({ error: "Please describe your issue in more detail." }, { status: 400 });
+    }
+    if (query.length > 1000) {
+      return Response.json({ error: "Input too long. Please keep it under 1000 characters." }, { status: 400 });
+    }
+
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    const model = genAI.getGenerativeModel({
+      model: "gemini-2.5-flash",
+      systemInstruction: SYSTEM_PROMPT,
+    });
+
+    const result = await model.generateContent(query);
+    const text = result.response.text();
+    return Response.json({ result: text });
+  } catch (error) {
+    console.error("Complaint API error:", error.message);
+    return Response.json(
+      { error: "Unable to generate complaint right now. Please try again." },
+      { status: 500 }
+    );
+  }
+}
+```
+
+---
+
+## DESIGN SYSTEM
+
+Colors:
+- Background: linear-gradient(135deg, #0a0a0a, #111111, #0d0d0d)
+- Gold accent: #d4af37
+- Dark gold hover: #b8962e
+- Bright gold: #f0d060
+- Text primary: #ffffff
+- Text secondary: #d1d5db / #e5e7eb
+- Text muted: #9ca3af / #6b7280
+- Card background: rgba(255,255,255,0.04)
+- Card border: rgba(255,255,255,0.08)
+- Error background: rgba(239,68,68,0.08)
+- Error border: rgba(239,68,68,0.2)
+- Error text: #f87171
+
+Fonts:
+- Headings: Playfair Display (Google Fonts)
+- Body: Inter (Google Fonts)
+
+Components:
+- .glass-card — frosted glass card effect
+- .gold-text — gradient gold text for logo
+- .btn-gold — primary gold button
+- .btn-dark — secondary dark button
+
+Animations (Framer Motion):
+- Page fade-in on load
+- Title slide-up
+- Button hover scale 1.02
+- Button tap scale 0.98
+- Output card fade-in + slide-up
+- Loading spinner with 3 bouncing gold dots
+
+---
+
+## INSTALLED PACKAGES
+
+Dependencies:
+- next: 16.2.6
+- react
+- react-dom
+- framer-motion
+- react-markdown
+- @google/generative-ai
+
+Dev Dependencies:
+- @tailwindcss/postcss
+- tailwindcss
+
+---
+
+## SECURITY IMPLEMENTATION
+
+1. API key stored ONLY in .env.local (local) and Vercel dashboard (production)
+2. .env.local is in .gitignore — never committed to GitHub
+3. All Gemini API calls happen in /api/ask and /api/complaint route files
+4. These are server-side files — browser never sees them
+5. Frontend only calls /api/ask and /api/complaint — never calls Gemini directly
+6. Input validation on both API routes (type check, min length, max length)
+7. Error messages are user-friendly — raw errors never shown to users
+8. Input length limited to 1000 characters
+
+---
+
+## PHASE 1 STATUS — 100% COMPLETE ✅
+
+Step 1 ✅ — Next.js project created with Tailwind, Framer Motion, Gemini SDK
+Step 2 ✅ — Premium black gold UI built (logo, textarea, buttons, cards, footer)
+Step 3 ✅ — /api/ask route created with legal Q&A system prompt
+Step 4 ✅ — /api/complaint route created with complaint drafting system prompt
+Step 5 ✅ — react-markdown installed and rendering properly in output cards
+Step 6 ✅ — Gemini model set to gemini-2.5-flash (free tier working)
+Step 7 ✅ — All 10 legal scenarios tested and passing
+Step 8 ✅ — Mobile tested and responsive
+Step 9 ✅ — Code pushed to GitHub (luckysingh08/nyaysetu)
+Step 10 ✅ — Deployed to Vercel (nyaysetu-eight.vercel.app)
+Step 11 ✅ — Google Search Console verified with HTML tag method
+Step 12 ✅ — Google indexing requested
+
+---
+
+## PHASE 2 PLAN — RAG LEGAL DATABASE (NOT STARTED)
+
+### What Phase 2 Does
+Replaces Gemini's memory-based answers with answers grounded in a verified
+Indian legal database. Every answer will cite the actual law source.
+
+### Current Flow (Phase 1)
+User question → Gemini answers from memory → Sometimes inaccurate
+
+### New Flow (Phase 2)
+User question → Search legal database → Get relevant law snippets →
+Give snippets to Gemini → Gemini answers using actual law → Cites source
+
+### Phase 2 Steps
+
+STEP 1 — Build legal_data.json
+Create 100-150 verified legal snippets from official Indian sources.
+Schema for each snippet:
+{
+  "id": "unique-id",
+  "title": "Short title",
+  "jurisdiction": "India",
+  "law": "Name of Act",
+  "section": "Section number",
+  "text": "Plain text legal snippet",
+  "source": "Official source name",
+  "source_url": "Official URL",
+  "tags": ["tag1", "tag2"],
+  "last_verified": "YYYY-MM-DD"
+}
+
+Legal areas to cover (10 total):
+1. Traffic police and vehicle stops
+2. Arrest and police questioning rights
+3. Online fraud and cybercrime
+4. Consumer complaints
+5. Landlord tenant disputes
+6. Domestic violence
+7. Workplace harassment
+8. Cheque bounce
+9. Lost documents and identity theft
+10. Property disputes
+
+Official sources (all free):
+- indiacode.nic.in (all Indian laws)
+- nalsa.gov.in (legal aid)
+- cybercrime.gov.in (cybercrime)
+- consumerhelpline.gov.in (consumer rights)
+- Ministry of Law and Justice
+- Bharatiya Nyaya Sanhita 2023 (new criminal law)
+- Bharatiya Nagarik Suraksha Sanhita 2023 (new CrPC)
+- Bharatiya Sakshya Adhiniyam 2023 (new evidence law)
+
+STEP 2 — Set Up Supabase
+- Create free Supabase account at supabase.com
+- Create new project
+- Enable pgvector extension
+- Create table for legal snippets + embeddings
+- Add SUPABASE_URL and SUPABASE_ANON_KEY to environment variables
+
+STEP 3 — Generate Embeddings
+- Write a script to read legal_data.json
+- Convert each snippet to vector using Gemini Embedding API
+- Store vectors in Supabase alongside snippets
+- Gemini Embedding API is free tier
+
+STEP 4 — Update API Routes
+- Update /api/ask to embed user query and search Supabase
+- Retrieve top 3-5 matching legal snippets
+- Build prompt with retrieved context
+- Gemini answers using those snippets
+- Response includes source citations
+
+STEP 5 — Add Citations to UI
+- Output cards show sources at bottom
+- Format: Law Name, Section — Source Name
+
+STEP 6 — Test and Deploy
+- Test all 10 scenarios again
+- Compare Phase 1 vs Phase 2 accuracy
+- Push to GitHub → Vercel auto-deploys
+
+### Phase 2 New Tech
+- Supabase — free tier — postgres + pgvector
+- Gemini Embedding API — free tier
+- New env vars: SUPABASE_URL, SUPABASE_ANON_KEY
+
+### Phase 2 Estimated Timeline
+Week 1 — Build legal_data.json (100+ snippets)
+Week 2 — Set up Supabase + generate embeddings
+Week 3 — Update API routes with RAG logic
+Week 4 — Add citations to UI + test
+Week 5 — Deploy and verify
+
+---
+
+## PHASE 3 PLAN — GROWTH FEATURES (NOT STARTED)
+
+Hindi language support
+Regional language support
+Voice input and output
+WhatsApp style chat interface
+OCR document upload
+Complaint templates library
+Chat history
+User accounts and login
+Lawyer referral marketplace
+Legal aid directory
+Emergency guidance flows
+Case status integration
+Paid complaint generation
+Premium detailed legal analysis
+NGO and legal aid dashboard
+Analytics and feedback system
+
+---
+
+## PRODUCT PRINCIPLES (NEVER VIOLATE)
+
+1. Clarity over complexity — plain language first
+2. Safety over confidence — never overclaim certainty
+3. Action over theory — always give next steps
+4. Citations over unsupported claims — cite sources when available
+5. Privacy by design — no unnecessary data collection
+6. No risky advice — never advise illegal actions
+7. Human escalation — recommend lawyers for serious matters
+
+---
+
+## LEGAL SAFETY RULES (MANDATORY IN ALL AI RESPONSES)
+
+- Always include disclaimer: "NyaySetu provides general legal information only. It is not a substitute for advice from a qualified lawyer."
+- Never fabricate legal section numbers or citations
+- Never guarantee legal outcomes
+- Never advise hiding, destroying, or fabricating evidence
+- Never advise bribery or evasion of law enforcement
+- Recommend qualified lawyer for: arrests, criminal charges, court deadlines, serious financial loss, domestic violence, property disputes
+- State clearly when laws vary by state or recent amendments
+
+---
+
+## TARGET USERS
+
+Primary: General Indian citizens, mobile-first, mixed literacy, urgent situations
+Secondary: NGO workers, legal aid volunteers, students, small business owners
+
+App must feel: Simple, Trustworthy, Calm, Premium, Non-intimidating, Mobile-first
+
+---
+
+## KEY DECISIONS ALREADY MADE
+
+- Using Gemini instead of OpenAI — free tier available, no card needed
+- Model: gemini-2.5-flash — best free tier option, 500 req/day
+- No TypeScript — keeping JavaScript for simplicity
+- No ESLint — removed to avoid dependency conflicts during setup
+- react-markdown — for rendering formatted AI output
+- Framer Motion — for professional animations
+- Vercel — zero-config deployment, auto-deploys on git push
+- Google Search Console — verified via HTML tag method in metadata
+- Input limit: 1000 characters on both frontend and backend
+- Error messages: user-friendly only, never raw backend errors
+
+---
+
+## HOW TO RUN LOCALLY
+
+1. Open terminal in VS Code
+2. cd /Users/luckysingh/Documents/nyaysetu
+3. npm run dev
+4. Open http://localhost:3000
+
+---
+
+## HOW TO DEPLOY CHANGES
+
+1. Make changes in VS Code
+2. Save with Cmd+S
+3. In terminal:
+   git add .
+   git commit -m "describe your change"
+   git push
+4. Vercel auto-deploys in 1-2 minutes
+5. Check live URL to verify
+
+---
+
+## ERRORS SOLVED IN PHASE 1 (FOR REFERENCE)
+
+Error 1: ERESOLVE npm dependency conflict
+Fix: Used --legacy-peer-deps flag
+
+Error 2: npm EEXIST permission denied
+Fix: sudo chown -R $(whoami) ~/.npm && npm cache clean --force
+
+Error 3: gemini-1.5-flash model 404 not found
+Fix: Changed to gemini-2.0-flash, then gemini-2.5-flash
+
+Error 4: 429 quota exceeded on gemini-2.0-flash
+Fix: Changed to gemini-2.5-flash (correct free tier model)
+
+Error 5: 503 service unavailable from Gemini
+Cause: Temporary Gemini server overload on free tier
+Fix: Just retry — not a code error
+
+Error 6: API key not being read after adding .env.local
+Fix: Restart npm run dev server after adding env variables
+
+Error 7: Raw markdown symbols showing in output
+Fix: Installed react-markdown and updated OutputCard component
+
+Error 8: Google Search Console HTML file verification failed
+Fix: Used HTML tag method via Next.js metadata verification object
+
+---
+
+## START OF NEXT SESSION INSTRUCTIONS
+
+When starting a new chat, paste this entire file and say:
+
+"I am Lucky Singh. This is my NyaySetu project context file.
+You are my CTO and cofounder. Read everything above carefully.
+Today I want to start Phase 2 — RAG Legal Database.
+Guide me through it step by step exactly like Phase 1."
+
+Claude will have complete context and can continue immediately
+without any re-explanation needed.
+
+---
+
+END OF NYAYSETU MASTER CONTEXT FILE
+Version 1.0 | Phase 1 Complete | May 2026
